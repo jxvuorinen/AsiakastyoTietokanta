@@ -1,15 +1,14 @@
-
 package data;
 
 public class Tyoskentely {
-    private String tyoskentelyId;
-    private Tyontekija tyontekija;
-    private Palvelutapahtuma palvelutapahtuma;
 
-    public Tyoskentely(String tyoskentelyId, Tyontekija tyontekija, Palvelutapahtuma palvelutapahtuma) {
-        this.tyoskentelyId = tyoskentelyId;
-        this.tyontekija = tyontekija;
-        this.palvelutapahtuma = palvelutapahtuma;
+    private String tyoskentelyId;
+    private String tyontekijaId;
+    private int palvelutapahtumaId;
+
+    public Tyoskentely(String tyontekijaId, int palvelutapahtumaId) {
+        this.tyontekijaId = tyontekijaId;
+        this.palvelutapahtumaId = palvelutapahtumaId;
     }
 
     public String getTyoskentelyId() {
@@ -20,21 +19,19 @@ public class Tyoskentely {
         this.tyoskentelyId = tyoskentelyId;
     }
 
-    public Tyontekija getTyontekija() {
-        return tyontekija;
+    public String getTyontekijaId() {
+        return tyontekijaId;
     }
 
-    public void setTyontekija(Tyontekija tyontekija) {
-        this.tyontekija = tyontekija;
+    public void setTyontekijaId(String tyontekijaId) {
+        this.tyontekijaId = tyontekijaId;
     }
 
-    public Palvelutapahtuma getPalvelutapahtuma() {
-        return palvelutapahtuma;
+    public int getPalvelutapahtumaId() {
+        return palvelutapahtumaId;
     }
 
-    public void setPalvelutapahtuma(Palvelutapahtuma palvelutapahtuma) {
-        this.palvelutapahtuma = palvelutapahtuma;
+    public void setPalvelutapahtumaId(int palvelutapahtumaId) {
+        this.palvelutapahtumaId = palvelutapahtumaId;
     }
-    
-    
 }

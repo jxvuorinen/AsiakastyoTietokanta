@@ -8,7 +8,7 @@ public class Tyontekija {
     private String nimike;
     private String yksikko;
     
-    public Tyontekija(String tyontekijaNro, String etunimi, String sukunimi, String nimike, String yksikko) {
+    public Tyontekija(String tyontekijaNro, String yksikko, String nimike, String etunimi, String sukunimi) {
         this.tyontekijaNro = tyontekijaNro;
         this.etunimi = etunimi;
         this.sukunimi = sukunimi;

@@ -1,53 +1,48 @@
 
 package data;
 
-import java.sql.Time;
-import java.sql.Timestamp;
-
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class Palvelutapahtuma {
-    private String tapahtumaId;
-    private Asiakas asiakas;
+    private int tapahtumaId;
+    private String asiakasId;
     private String palvelunLaji;
-    private Timestamp ajankohta;
+    private LocalDateTime ajankohta;
     private String kuvaus;
-    private Time kesto;
+    private LocalTime kesto;
     
-    public Palvelutapahtuma(Asiakas asiakas, String palvelunLaji, Timestamp ajankohta, Time kesto, String kuvaus) {
-        this.asiakas = asiakas;
+    public Palvelutapahtuma(String asiakasId, String palvelunLaji, LocalDateTime ajankohta, LocalTime kesto, String kuvaus) {
+        this.asiakasId = asiakasId;
         this.palvelunLaji = palvelunLaji;
         this.ajankohta = ajankohta;
         this.kesto = kesto;
         this.kuvaus = kuvaus;
     }
     
-    public Palvelutapahtuma(String tapahtumaId, Asiakas asiakas, String palvelunLaji, Timestamp ajankohta, Time kesto, String kuvaus) {
-        this(asiakas, palvelunLaji, ajankohta, kesto, kuvaus);
+    public Palvelutapahtuma(int tapahtumaId, String asiakasId, String palvelunLaji, LocalDateTime ajankohta, LocalTime kesto, String kuvaus) {
+        this(asiakasId, palvelunLaji, ajankohta, kesto, kuvaus);
         this.tapahtumaId = tapahtumaId;
     }
 
-    public Time getKesto() {
+    public LocalTime getKesto() {
         return kesto;
     }
 
-    public void setKesto(Time kesto) {
+    public void setKesto(LocalTime kesto) {
         this.kesto = kesto;
     }
 
-    public String getTapahtumaId() {
+    public int getTapahtumaId() {
         return tapahtumaId;
     }
 
-    public void setTapahtumaId(String tapahtumaId) {
+    public void setTapahtumaId(int tapahtumaId) {
         this.tapahtumaId = tapahtumaId;
     }
 
-    public Asiakas getAsiakas() {
-        return asiakas;
-    }
-
-    public void setAsiakas(Asiakas asiakas) {
-        this.asiakas = asiakas;
+    public String getAsiakasId() {
+        return this.asiakasId;
     }
 
     public String getPalvelunLaji() {
@@ -58,11 +53,11 @@ public class Palvelutapahtuma {
         this.palvelunLaji = palvelunLaji;
     }
 
-    public Timestamp getAjankohta() {
+    public LocalDateTime getAjankohta() {
         return ajankohta;
     }
 
-    public void setAjankohta(Timestamp ajankohta) {
+    public void setAjankohta(LocalDateTime ajankohta) {
         this.ajankohta = ajankohta;
     }
 
