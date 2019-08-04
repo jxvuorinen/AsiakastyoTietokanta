@@ -59,5 +59,10 @@ public class Asiakas {
     public void setAsuinalue(String asuinalue) {
         this.asuinalue = asuinalue;
     }
+
+    @Override
+    public String toString() {
+        return "Asiakas{" + "etunimi=" + etunimi + ", sukunimi=" + sukunimi + ", asiakasId=" + asiakasId + ", sukupuoli=" + sukupuoli + ", asuinalue=" + asuinalue + '}';
+    }
     
 }

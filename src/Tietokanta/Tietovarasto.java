@@ -2,6 +2,7 @@ package Tietokanta;
 
 import com.mysql.jdbc.Statement;
 import data.Asiakas;
+import data.Kysely;
 import data.Palvelutapahtuma;
 import data.Tyontekija;
 import data.Tyoskentely;
@@ -11,6 +12,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Tietovarasto {
 
@@ -19,7 +24,7 @@ public class Tietovarasto {
     private String kayttajatunnus = "root";
     private String salasana = "";
 
-    private String sqlLisaaAsiakas = "INSERT INTO asiakas(etunimi, sukunimi, sukupuoli, asuinalue) VALUES (?,?,?,?)";
+    private String sqlLisaaAsiakas = "INSERT INTO asiakas VALUES (?,?,?,?,?)";
 
     private String sqlHaeAsiakas = "SELECT * FROM asiakas WHERE asiakasID = ?";
 
@@ -28,6 +33,16 @@ public class Tietovarasto {
     private String sqlLisaaPalvelutapahtuma = "INSERT INTO palvelutapahtuma(asiakasID, palvelunLaji, ajankohta, kesto, kuvaus) VALUES (?,?,?,?,?)";
 
     private String sqlLisaaTyoskentely = "INSERT INTO tyoskentely(tyontekijanro, palvelutapahtumaID) VALUES (?,?)";
+
+    private String sqlTapahtumahaku = "SELECT tyontekija.tyontekijaNimeke, yksikko, palvelunLaji, kuvaus"
+            + " FROM Asiakas JOIN Palvelutapahtuma"
+            + " ON asiakas.asiakasID=palvelutapahtuma.asiakasID"
+            + " JOIN Tyoskentely"
+            + " On tyoskentely.palvelutapahtumaID = palvelutapahtuma.palvelutapahtumaID"
+            + " JOIN tyontekija"
+            + " ON tyoskentely.tyontekijanro = tyontekija.tyontekijanro"
+            + " WHERE asiakas.asiakasID = ?"
+            + " ORDER BY ajankohta ASC";
 
     public void lisaaAsiakas(Asiakas uusiAsiakas) throws Exception {
         Connection yhteys = null;
@@ -39,10 +54,11 @@ public class Tietovarasto {
         PreparedStatement asiakkaanLisays = null;
         try {
             asiakkaanLisays = yhteys.prepareStatement(sqlLisaaAsiakas);
-            asiakkaanLisays.setString(1, uusiAsiakas.getEtunimi());// ensimmäinen kysymysmerkki
-            asiakkaanLisays.setString(2, uusiAsiakas.getSukunimi());// toinen kysymysmerkki
-            asiakkaanLisays.setString(3, uusiAsiakas.getSukupuoli());// jne
-            asiakkaanLisays.setString(4, uusiAsiakas.getAsuinalue());
+            asiakkaanLisays.setString(1, uusiAsiakas.getAsiakasId());// ensimmäinen kysymysmerkki
+            asiakkaanLisays.setString(2, uusiAsiakas.getEtunimi());// toinen kysymysmerkki
+            asiakkaanLisays.setString(3, uusiAsiakas.getSukunimi());// kolmas kysymysmerkki
+            asiakkaanLisays.setString(4, uusiAsiakas.getSukupuoli());// jne
+            asiakkaanLisays.setString(5, uusiAsiakas.getAsuinalue());
             asiakkaanLisays.executeUpdate();
         } catch (SQLException sqle) {
             sqle.printStackTrace();
@@ -59,15 +75,15 @@ public class Tietovarasto {
         } catch (Exception e) {
             throw new Exception("Tietovarasto ei ole auki.", e);
         }
-        PreparedStatement TyontekijanLisays = null;
+        PreparedStatement tyontekijanLisays = null;
         try {
-            TyontekijanLisays = yhteys.prepareStatement(sqlLisaaTyontekija);
-            TyontekijanLisays.setString(1, uusiTyontekija.getTyontekijaNro());// ensimmäinen kysymysmerkki
-            TyontekijanLisays.setString(2, uusiTyontekija.getYksikko()); // Toinen kysymysmerkki
-            TyontekijanLisays.setString(3, uusiTyontekija.getNimike());
-            TyontekijanLisays.setString(4, uusiTyontekija.getEtunimi());
-            TyontekijanLisays.setString(5, uusiTyontekija.getSukunimi());
-            TyontekijanLisays.executeUpdate();
+            tyontekijanLisays = yhteys.prepareStatement(sqlLisaaTyontekija);
+            tyontekijanLisays.setString(1, uusiTyontekija.getTyontekijaNro());// ensimmäinen kysymysmerkki
+            tyontekijanLisays.setString(2, uusiTyontekija.getYksikko()); // Toinen kysymysmerkki
+            tyontekijanLisays.setString(3, uusiTyontekija.getNimike());
+            tyontekijanLisays.setString(4, uusiTyontekija.getEtunimi());
+            tyontekijanLisays.setString(5, uusiTyontekija.getSukunimi());
+            tyontekijanLisays.executeUpdate();
         } catch (SQLException sqle) {
             sqle.printStackTrace();
             throw new Exception("Asiakkaan lisäys ei onnistu.", sqle);
@@ -84,17 +100,17 @@ public class Tietovarasto {
         } catch (Exception e) {
             throw new Exception("Tietovarasto ei ole auki.", e);
         }
-        PreparedStatement TapahtumanLisays = null;
+        PreparedStatement tapahtumanLisays = null;
         try {
-            TapahtumanLisays = yhteys.prepareStatement(sqlLisaaPalvelutapahtuma, Statement.RETURN_GENERATED_KEYS);
-            TapahtumanLisays.setString(1, uusiTapahtuma.getAsiakasId());// ensimmäinen kysymysmerkki
-            TapahtumanLisays.setString(2, uusiTapahtuma.getPalvelunLaji()); // Toinen kysymysmerkki
-            TapahtumanLisays.setTimestamp(3, Timestamp.valueOf(uusiTapahtuma.getAjankohta()));
-            TapahtumanLisays.setTime(4, Time.valueOf(uusiTapahtuma.getKesto()));
-            TapahtumanLisays.setString(5, uusiTapahtuma.getKuvaus());
-            TapahtumanLisays.executeUpdate();
-            ResultSet key = TapahtumanLisays.getGeneratedKeys();
-            if(key.next()) {
+            tapahtumanLisays = yhteys.prepareStatement(sqlLisaaPalvelutapahtuma, Statement.RETURN_GENERATED_KEYS);
+            tapahtumanLisays.setString(1, uusiTapahtuma.getAsiakasId());// ensimmäinen kysymysmerkki
+            tapahtumanLisays.setString(2, uusiTapahtuma.getPalvelunLaji()); // Toinen kysymysmerkki
+            tapahtumanLisays.setTimestamp(3, Timestamp.valueOf(uusiTapahtuma.getAjankohta()));
+            tapahtumanLisays.setTime(4, Time.valueOf(uusiTapahtuma.getKesto()));
+            tapahtumanLisays.setString(5, uusiTapahtuma.getKuvaus());
+            tapahtumanLisays.executeUpdate();
+            ResultSet key = tapahtumanLisays.getGeneratedKeys();
+            if (key.next()) {
                 int tapahtumaId = key.getInt(1);
                 uusiTapahtuma.setTapahtumaId(tapahtumaId);
             }
@@ -113,18 +129,72 @@ public class Tietovarasto {
         } catch (Exception e) {
             throw new Exception("Tietovarasto ei ole auki.", e);
         }
-        PreparedStatement TyonLisays = null;
+        PreparedStatement tyonLisays = null;
         try {
-            TyonLisays = yhteys.prepareStatement(sqlLisaaTyoskentely);
-            TyonLisays.setString(1, uusiTyoskentely.getTyontekijaId());// ensimmäinen kysymysmerkki
-            TyonLisays.setInt(2, uusiTyoskentely.getPalvelutapahtumaId()); // Toinen kysymysmerkki
-            TyonLisays.executeUpdate();
+            tyonLisays = yhteys.prepareStatement(sqlLisaaTyoskentely);
+            tyonLisays.setString(1, uusiTyoskentely.getTyontekijaId());// ensimmäinen kysymysmerkki
+            tyonLisays.setInt(2, uusiTyoskentely.getPalvelutapahtumaId()); // Toinen kysymysmerkki
+            tyonLisays.executeUpdate();
         } catch (SQLException sqle) {
             sqle.printStackTrace();
             throw new Exception("Tapahtuman lisäys ei onnistu.", sqle);
         } finally {
             Yhteydenhallinta.suljeYhteys(yhteys);
         }
+    }
+
+    public Asiakas haeAsiakas(String asiakasId) throws Exception {
+        Connection yhteys = null;
+        try {
+            yhteys = Yhteydenhallinta.avaaYhteys(ajuri, url, kayttajatunnus, salasana);
+        } catch (Exception e) {
+            throw new Exception("Tietovarasto ei ole auki.", e);
+        }
+        PreparedStatement asiakkaanHaku = null;
+        ResultSet tulos = null;
+        try {
+            asiakkaanHaku = yhteys.prepareStatement(sqlHaeAsiakas);
+            asiakkaanHaku.setString(1, asiakasId);
+            tulos = asiakkaanHaku.executeQuery();
+            if (tulos.next()) {
+                return new Asiakas(tulos.getString(1), tulos.getString(2), tulos.getString(3), tulos.getString(4), tulos.getString(5));
+            } else {
+                throw new Exception("Asiakasta ei löydy");
+            }
+
+        } catch (SQLException sqle) {
+            throw new Exception("Hakuvirhe", sqle);
+        } finally {
+            Yhteydenhallinta.suljeYhteys(yhteys);
+        }
+
+    }
+
+    public List<Kysely> haeTapahtumat(Asiakas haettu) throws Exception {
+        String asiakasId = haettu.getAsiakasId();
+        Connection yhteys = null;
+        List<Kysely> tapahtumat = new ArrayList<>();
+        try {
+            yhteys = Yhteydenhallinta.avaaYhteys(ajuri, url, kayttajatunnus, salasana);
+        } catch (Exception e) {
+            throw new Exception("Tietovarasto ei ole auki.", e);
+        }
+        PreparedStatement tapahtumienHaku = null;
+        ResultSet tulos = null;
+        try {
+            tapahtumienHaku = yhteys.prepareStatement(sqlTapahtumahaku);
+            tapahtumienHaku.setString(1, asiakasId);
+            tulos = tapahtumienHaku.executeQuery();
+            while (tulos.next()) {
+                tapahtumat.add(new Kysely(tulos.getString(1), tulos.getString(2), tulos.getString(3), tulos.getString(4)));
+            }
+
+        } catch (SQLException sqle) {
+            throw new Exception("Hakuvirhe", sqle);
+        } finally {
+            Yhteydenhallinta.suljeYhteys(yhteys);
+        }
+        return tapahtumat;
     }
 
 }

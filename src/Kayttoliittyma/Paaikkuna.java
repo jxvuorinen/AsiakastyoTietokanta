@@ -21,10 +21,10 @@ public class Paaikkuna extends Application {
         Button etusivu = new Button("Etusivulle");
         Button lisaaAsiakas = new Button("Lisää asiakas");
         Button lisaaTyontekija = new Button("Lisää työntekijä");
+        Button haku = new Button("Haku");
         Button lisaaPalvelutapahtuma = new Button("Lisää palvelutapahtuma");
-        //Button lisaaTyo = new Button("Lisää työskentelytiedot");
 
-        napit.getChildren().addAll(etusivu, lisaaAsiakas, lisaaTyontekija, lisaaPalvelutapahtuma);
+        napit.getChildren().addAll(etusivu, lisaaAsiakas, lisaaTyontekija, haku, lisaaPalvelutapahtuma);
 
         //BorderPanen yläosaan napit
         BorderPane asettelu = new BorderPane();
@@ -48,6 +48,10 @@ public class Paaikkuna extends Application {
         //Liitetään työntekijänlisäysnäkymä välilehden nappiin
         lisaaTyontekija.setOnAction((event) -> {
             TyontekijanLisays tyontekijanakyma = new TyontekijanLisays(asettelu);
+        });
+        
+        haku.setOnAction((event) -> {
+            Haku hakunakyma = new Haku(asettelu);
         });
 
         lisaaPalvelutapahtuma.setOnAction((event) -> {

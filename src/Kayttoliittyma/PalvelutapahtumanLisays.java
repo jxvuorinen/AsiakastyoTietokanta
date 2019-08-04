@@ -17,21 +17,19 @@ import javafx.scene.layout.GridPane;
 public class PalvelutapahtumanLisays {
     
     private BorderPane nakyma;
-    Label lbHakukentta = new Label("Asiakkaan tunniste: ");
-    TextField tfHakukentta = new TextField();
+    Label lbHetu = new Label("Asiakkaan henkilötunnus: ");
+    TextField tfHetu = new TextField();
     Label lbPalvelunlaji = new Label("Valitse palvelunlaji: ");
     ComboBox cbPalvelunlaji = new ComboBox();    
     Label date = new Label("Valitse tapahtuman pvm: ");
     DatePicker paivyri = new DatePicker();
-    Label time = new Label("Aloitusaika: (HH:MM:SS) ");
+    Label time = new Label("Aloitusaika: (HH:MM) ");
     TextField tfTime = new TextField();
-    Label kesto = new Label("Kesto: (HH:MM:SS) ");
+    Label kesto = new Label("Kesto: (HH:MM) ");
     TextField tfKesto = new TextField();
     Label lbKuvaus = new Label("Tapahtuman kuvaus: ");
     TextField tfKuvaus = new TextField();
     Button talleta = new Button("Talleta");
-    Button haeAsiakas = new Button("Hae asiakas");
-    Label haettu = new Label("");
     Label tyontekijaId = new Label("Työntekijänrosi: ");
     TextField tfTyontekijaId = new TextField();
     
@@ -48,9 +46,8 @@ public class PalvelutapahtumanLisays {
                 "kotikäynti", "puhelu", "dokumentointi", "saatto", "toimistokäynti",
                 "selvittely", "arviointiryhmän käsittely", "päätöksenteko",
                 "verkostotyö", "muu");
-        palvelutapahtumakentat.add(lbHakukentta, 0, 0);
-        palvelutapahtumakentat.add(tfHakukentta, 1, 0);
-        palvelutapahtumakentat.add(haeAsiakas, 2, 0);
+        palvelutapahtumakentat.add(lbHetu, 0, 0);
+        palvelutapahtumakentat.add(tfHetu, 1, 0);
         palvelutapahtumakentat.add(lbPalvelunlaji, 0, 1);
         palvelutapahtumakentat.add(cbPalvelunlaji, 1, 1);
         palvelutapahtumakentat.add(date, 0, 2);
@@ -71,7 +68,7 @@ public class PalvelutapahtumanLisays {
         talleta.setOnAction((event) -> {
             Tietovarasto rekisteri = new Tietovarasto();
             try {
-                String asiakasId = tfHakukentta.getText();
+                String asiakasId = tfHetu.getText();
                 String palvelunLaji = cbPalvelunlaji.getValue().toString();
                 LocalTime klo = LocalTime.parse(tfTime.getText());
                 LocalDateTime ajankohta = LocalDateTime.of(paivyri.getValue(), klo);
