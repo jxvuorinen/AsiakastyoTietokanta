@@ -55,6 +55,11 @@ public class Tyontekija {
     public void setYksikko(String yksikko) {
         this.yksikko = yksikko;
     }
+
+    @Override
+    public String toString() {
+        return "Työntekijän tiedot: \n" + " Työntekijänro: " + tyontekijaNro + "\n Etunimi: " + etunimi + "\n Sukunimi: " + sukunimi + "\n Nimike: " + nimike + "\n Yksikkö: " + yksikko;
+    }
     
     
     

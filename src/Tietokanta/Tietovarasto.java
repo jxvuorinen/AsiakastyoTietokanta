@@ -12,8 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +25,8 @@ public class Tietovarasto {
     private String sqlLisaaAsiakas = "INSERT INTO asiakas VALUES (?,?,?,?,?)";
 
     private String sqlHaeAsiakas = "SELECT * FROM asiakas WHERE asiakasID = ?";
+    
+    private String sqlHaeTyontekija = "SELECT * FROM tyontekija WHERE tyontekijanro = ?";
 
     private String sqlLisaaTyontekija = "INSERT INTO tyontekija(tyontekijanro, yksikko, tyontekijaNimeke, etunimi, sukunimi) VALUES (?,?,?,?,?)";
 
@@ -160,6 +160,33 @@ public class Tietovarasto {
                 return new Asiakas(tulos.getString(1), tulos.getString(2), tulos.getString(3), tulos.getString(4), tulos.getString(5));
             } else {
                 throw new Exception("Asiakasta ei löydy");
+            }
+
+        } catch (SQLException sqle) {
+            throw new Exception("Hakuvirhe", sqle);
+        } finally {
+            Yhteydenhallinta.suljeYhteys(yhteys);
+        }
+
+    }
+    
+    public Tyontekija haeTyontekija(String tyontekijanro) throws Exception {
+        Connection yhteys = null;
+        try {
+            yhteys = Yhteydenhallinta.avaaYhteys(ajuri, url, kayttajatunnus, salasana);
+        } catch (Exception e) {
+            throw new Exception("Tietovarasto ei ole auki.", e);
+        }
+        PreparedStatement tyontekijaHaku = null;
+        ResultSet tulos = null;
+        try {
+            tyontekijaHaku = yhteys.prepareStatement(sqlHaeTyontekija);
+            tyontekijaHaku.setString(1, tyontekijanro);
+            tulos = tyontekijaHaku.executeQuery();
+            if (tulos.next()) {
+                return new Tyontekija(tulos.getString(1), tulos.getString(2), tulos.getString(3), tulos.getString(4), tulos.getString(5));
+            } else {
+                throw new Exception("Työntekijää ei löydy");
             }
 
         } catch (SQLException sqle) {

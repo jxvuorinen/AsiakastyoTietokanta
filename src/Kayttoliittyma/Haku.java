@@ -3,6 +3,7 @@ package Kayttoliittyma;
 import Tietokanta.Tietovarasto;
 import data.Asiakas;
 import data.Kysely;
+import data.Tyontekija;
 import java.time.LocalTime;
 import java.util.List;
 import javafx.event.ActionEvent;
@@ -62,11 +63,11 @@ public class Haku {
         hakukentat.add(cbPalvelunlaji, 2, 3);
         hakukentat.add(paivyriAlkaen, 3, 3);
         hakukentat.add(paivyriPaattyen, 4, 3);
-        
+
         hakukentat.setHgap(5);
         hakukentat.setVgap(5);
         hakukentat.setPadding(new Insets(10, 10, 10, 10));
-        
+
         cbPalvelunlaji.getItems().addAll(
                 "kotikäynti", "puhelu", "dokumentointi", "saatto", "toimistokäynti",
                 "selvittely", "arviointiryhmän käsittely", "päätöksenteko",
@@ -76,7 +77,7 @@ public class Haku {
         cbYksikko.setPromptText("Valitse yksikkö");
         paivyriAlkaen.setPromptText("Alkaen pvm");
         paivyriPaattyen.setPromptText("Päättyen pvm");
-        
+
         uusiPane.setTop(hakukentat);
         uusiPane.setBottom(hakutulos);
 
@@ -86,7 +87,51 @@ public class Haku {
         hakutulos.setPrefHeight(400);
         hakukentat.setAlignment(Pos.TOP_CENTER);
 
-        //Tallennuspainikkeen toiminto:
+        //Tallennuspainikkeen toiminnot:
+        haeAsiakas.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Tietovarasto rekisteri = new Tietovarasto();
+                try {
+                    String asiakasId = tfHetu1.getText();
+                    if (asiakasId.isEmpty()) {
+                        Alert virheviesti = new Alert(Alert.AlertType.WARNING);
+                        virheviesti.setContentText("Tiedoissa puutteita");
+                        virheviesti.show();
+                    } else {
+                        Asiakas haettu = rekisteri.haeAsiakas(asiakasId);
+                        hakutulos.setText(haettu.toString());
+                    }
+                } catch (Exception e) {
+                    Alert error = new Alert(Alert.AlertType.ERROR);
+                    error.setContentText("Virhe" + e);
+                    error.show();
+                }
+            }
+        });
+        
+        haeTyontekija.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Tietovarasto rekisteri = new Tietovarasto();
+                try {
+                    String tyontekijanro = tfTyontekijaNro.getText();
+                    if (tyontekijanro.isEmpty()) {
+                        Alert virheviesti = new Alert(Alert.AlertType.WARNING);
+                        virheviesti.setContentText("Tiedoissa puutteita");
+                        virheviesti.show();
+                    } else {
+                        Tyontekija haettu = rekisteri.haeTyontekija(tyontekijanro);
+                        hakutulos.setText(haettu.toString());
+                    }
+                } catch (Exception e) {
+                    Alert error = new Alert(Alert.AlertType.ERROR);
+                    error.setContentText("Virhe" + e);
+                    error.show();
+                }
+            }
+        });
+        
         haeTapahtumat.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
