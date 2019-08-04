@@ -4,6 +4,8 @@ import Tietokanta.Tietovarasto;
 import data.Asiakas;
 import data.Kysely;
 import java.util.List;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -38,44 +40,47 @@ public class Haku {
         hakutulos.setEditable(false);
 
         //Tallennuspainikkeen toiminto:
-        haeNappi.setOnAction((event) -> {
-            Tietovarasto rekisteri = new Tietovarasto();
-            try {
-                String asiakasId = tfHetu.getText();
-                if (asiakasId.isEmpty()) {
-                    Alert virheviesti = new Alert(Alert.AlertType.WARNING);
-                    virheviesti.setContentText("Tiedoissa puutteita");
-                    virheviesti.show();
-
-                } else {
-                    Asiakas haettu = rekisteri.haeAsiakas(asiakasId);
-                    StringBuilder msg = new StringBuilder();
-                    if (haettu == null) {
+        haeNappi.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Tietovarasto rekisteri = new Tietovarasto();
+                try {
+                    String asiakasId = tfHetu.getText();
+                    if (asiakasId.isEmpty()) {
                         Alert virheviesti = new Alert(Alert.AlertType.WARNING);
-                        virheviesti.setContentText("Asiakasta ei löytynyt");
+                        virheviesti.setContentText("Tiedoissa puutteita");
                         virheviesti.show();
+                        
                     } else {
-                        List<Kysely> kyselytulos = rekisteri.haeTapahtumat(haettu);
-                        for (Kysely tapahtuma : kyselytulos) {
-                            msg.append(tapahtuma.toString());
-                            msg.append("\n");
-                        }
-                        if (msg.length() == 0) {
-                            hakutulos.setText("Ei tapahtumia");
+                        Asiakas haettu = rekisteri.haeAsiakas(asiakasId);
+                        StringBuilder msg = new StringBuilder();
+                        if (haettu == null) {
+                            Alert virheviesti = new Alert(Alert.AlertType.WARNING);
+                            virheviesti.setContentText("Asiakasta ei löytynyt");
+                            virheviesti.show();
                         } else {
-                            hakutulos.setText(msg.toString());
+                            List<Kysely> kyselytulos = rekisteri.haeTapahtumat(haettu);
+                            for (Kysely tapahtuma : kyselytulos) {
+                                msg.append(tapahtuma.toString());
+                                msg.append("\n" + "" + "\n");
+                            }
+                            if (msg.length() == 0) {
+                                hakutulos.setText("Ei tapahtumia");
+                            } else {
+                                String maara = Integer.toString(kyselytulos.size());
+                                msg.append("Tapahtumia yhteensä: ").append(maara).append("\n");
+                                hakutulos.setText(msg.toString());
+                            }
+                            
                         }
-
                     }
+                } catch (Exception e) {
+                    Alert error = new Alert(Alert.AlertType.ERROR);
+                    error.setContentText("Virhe" + e);
+                    error.show();
                 }
-            } catch (Exception e) {
-                Alert error = new Alert(Alert.AlertType.ERROR);
-                error.setContentText("Virhe" + e);
-                error.show();
             }
-
-        }
-        );
+        });
     }
 
 }

@@ -34,9 +34,9 @@ public class Tietovarasto {
 
     private String sqlLisaaTyoskentely = "INSERT INTO tyoskentely(tyontekijanro, palvelutapahtumaID) VALUES (?,?)";
 
-    private String sqlTapahtumahaku = "SELECT tyontekija.tyontekijaNimeke, yksikko, palvelunLaji, kuvaus"
+    private String sqlTapahtumahaku = "SELECT tyontekija.tyontekijaNimeke, yksikko, ajankohta, palvelunLaji, kesto, kuvaus"
             + " FROM Asiakas JOIN Palvelutapahtuma"
-            + " ON asiakas.asiakasID=palvelutapahtuma.asiakasID"
+            + " ON asiakas.asiakasID = palvelutapahtuma.asiakasID"
             + " JOIN Tyoskentely"
             + " On tyoskentely.palvelutapahtumaID = palvelutapahtuma.palvelutapahtumaID"
             + " JOIN tyontekija"
@@ -186,7 +186,7 @@ public class Tietovarasto {
             tapahtumienHaku.setString(1, asiakasId);
             tulos = tapahtumienHaku.executeQuery();
             while (tulos.next()) {
-                tapahtumat.add(new Kysely(tulos.getString(1), tulos.getString(2), tulos.getString(3), tulos.getString(4)));
+                tapahtumat.add(new Kysely(tulos.getString(1), tulos.getString(2), tulos.getTimestamp(3).toLocalDateTime(), tulos.getString(4), tulos.getTime(5).toLocalTime(), tulos.getString(6)));
             }
 
         } catch (SQLException sqle) {

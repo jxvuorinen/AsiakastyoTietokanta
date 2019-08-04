@@ -12,7 +12,7 @@ public class Kysely {
     private LocalTime kesto;
     private String kuvaus;
 
-    public Kysely(String tyontekijaNimeke, String yksikko, String palvelunLaji, String kuvaus) {
+    public Kysely(String tyontekijaNimeke, String yksikko, LocalDateTime ajankohta, String palvelunLaji, LocalTime kesto, String kuvaus) {
         this.tyontekijaNimeke = tyontekijaNimeke;
         this.yksikko = yksikko;
         this.ajankohta = ajankohta;
@@ -23,7 +23,7 @@ public class Kysely {
 
     @Override
     public String toString() {
-        return "Tyontekijänimeke: " + tyontekijaNimeke + ". Yksikkö: " + yksikko + ". Palvelu: " + palvelunLaji + ". Kuvaus: " + kuvaus;
+        return "Tyontekijänimeke: " + tyontekijaNimeke + ". Yksikkö: " + yksikko + ".\n Ajankohta: " + ajankohta + ". Palvelu: " + palvelunLaji + ". Kesto: " + kesto + ". Kuvaus: " + kuvaus;
     }
     
     
