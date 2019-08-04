@@ -21,6 +21,11 @@ public class Kysely {
         this.kuvaus = kuvaus;
     }
 
+    public LocalTime getKesto() {
+        return kesto;
+    }
+    
+
     @Override
     public String toString() {
         return "Tyontekijänimeke: " + tyontekijaNimeke + ". Yksikkö: " + yksikko + ".\n Ajankohta: " + ajankohta + ". Palvelu: " + palvelunLaji + ". Kesto: " + kesto + ". Kuvaus: " + kuvaus;

@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Paaikkuna extends Application {
@@ -24,15 +25,15 @@ public class Paaikkuna extends Application {
         Button haku = new Button("Haku");
         Button lisaaPalvelutapahtuma = new Button("Lisää palvelutapahtuma");
 
-        napit.getChildren().addAll(etusivu, lisaaAsiakas, lisaaTyontekija, haku, lisaaPalvelutapahtuma);
+        napit.getChildren().addAll(etusivu, lisaaAsiakas, lisaaTyontekija, lisaaPalvelutapahtuma, haku);
 
         //BorderPanen yläosaan napit
         BorderPane asettelu = new BorderPane();
         asettelu.setTop(napit);
-        asettelu.setPrefSize(600, 400);
+        asettelu.setPrefSize(800, 400);
 
         //Näytetään aluksi aloitusnäkymä BorderPanen keskellä
-        Label ohjeteksti = new Label("Tervetuloa hallinnoimaan asiakastyön tallennusjärjestelmää! \n"
+        Text ohjeteksti = new Text("Tervetuloa hallinnoimaan asiakastyön tallennusjärjestelmää! \n"
                 + "Valitse ylävalikosta, mitä tietoa haluat tallentaa.");
         asettelu.setCenter(ohjeteksti);
 

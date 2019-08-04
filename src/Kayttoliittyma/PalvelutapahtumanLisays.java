@@ -20,7 +20,7 @@ public class PalvelutapahtumanLisays {
     Label lbHetu = new Label("Asiakkaan henkilötunnus: ");
     TextField tfHetu = new TextField();
     Label lbPalvelunlaji = new Label("Valitse palvelunlaji: ");
-    ComboBox cbPalvelunlaji = new ComboBox();    
+    ComboBox cbPalvelunlaji = new ComboBox();
     Label date = new Label("Valitse tapahtuman pvm: ");
     DatePicker paivyri = new DatePicker();
     Label time = new Label("Aloitusaika: (HH:MM) ");
