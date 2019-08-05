@@ -3,7 +3,6 @@ package Kayttoliittyma;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
@@ -30,7 +29,7 @@ public class Paaikkuna extends Application {
         //BorderPanen yläosaan napit
         BorderPane asettelu = new BorderPane();
         asettelu.setTop(napit);
-        asettelu.setPrefSize(800, 400);
+        asettelu.setPrefSize(1000, 400);
 
         //Näytetään aluksi aloitusnäkymä BorderPanen keskellä
         Text ohjeteksti = new Text("Tervetuloa hallinnoimaan asiakastyön tallennusjärjestelmää! \n"

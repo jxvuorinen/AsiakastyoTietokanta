@@ -44,7 +44,7 @@ public class PalvelutapahtumanLisays {
     private void asetteleKomponentit() {
         cbPalvelunlaji.getItems().addAll(
                 "kotikäynti", "puhelu", "dokumentointi", "saatto", "toimistokäynti",
-                "selvittely", "arviointiryhmän käsittely", "päätöksenteko",
+                "selvittely", "arviointiryhmäkäsittely", "päätöksenteko",
                 "verkostotyö", "muu");
         palvelutapahtumakentat.add(lbHetu, 0, 0);
         palvelutapahtumakentat.add(tfHetu, 1, 0);

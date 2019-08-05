@@ -3,6 +3,7 @@ package Tietokanta;
 import com.mysql.jdbc.Statement;
 import data.Asiakas;
 import data.Kysely;
+import data.PalvelumaaraKysely;
 import data.Palvelutapahtuma;
 import data.Tyontekija;
 import data.Tyoskentely;
@@ -12,6 +13,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +47,14 @@ public class Tietovarasto {
             + " ON tyoskentely.tyontekijanro = tyontekija.tyontekijanro"
             + " WHERE asiakas.asiakasID = ?"
             + " ORDER BY ajankohta ASC";
+    
+    private String sqlPalvelutYksikoittain ="SELECT yksikko, COUNT(palvelutapahtuma.palvelunLaji) " +
+"FROM Tyoskentely JOIN Palvelutapahtuma " +
+"ON tyoskentely.palvelutapahtumaID = palvelutapahtuma.palvelutapahtumaID " +
+"JOIN tyontekija " +
+"ON tyontekija.tyontekijanro = tyoskentely.tyontekijanro " +
+"WHERE palvelutapahtuma.palvelunLaji = ? AND ajankohta BETWEEN ? AND ? " +
+"GROUP BY yksikko";
 
     public void lisaaAsiakas(Asiakas uusiAsiakas) throws Exception {
         Connection yhteys = null;
@@ -223,5 +235,33 @@ public class Tietovarasto {
         }
         return tapahtumat;
     }
+    public List<PalvelumaaraKysely> haePalveluMaaratYksikoittain(String palvelunlaji, LocalDate alkupvm, LocalDate loppupvm) throws Exception {
+        Connection yhteys = null;
+        List<PalvelumaaraKysely> yksikonTapahtumamaarat = new ArrayList<>();
+        try {
+            yhteys = Yhteydenhallinta.avaaYhteys(ajuri, url, kayttajatunnus, salasana);
+        } catch (Exception e) {
+            throw new Exception("Tietovarasto ei ole auki.", e);
+        }
+        PreparedStatement palvelumaarienHaku = null;
+        ResultSet tulos = null;
+        try {
+            palvelumaarienHaku = yhteys.prepareStatement(sqlPalvelutYksikoittain);
+            palvelumaarienHaku.setString(1, palvelunlaji);
+            palvelumaarienHaku.setObject(2, alkupvm.format(DateTimeFormatter.ISO_DATE));
+            palvelumaarienHaku.setObject(3, loppupvm.format(DateTimeFormatter.ISO_DATE));
+            tulos = palvelumaarienHaku.executeQuery();
+             while (tulos.next()) {
+                yksikonTapahtumamaarat.add(new PalvelumaaraKysely(tulos.getString(1), tulos.getInt(2)));
+            }
+             } catch (SQLException sqle) {
+            throw new Exception("Hakuvirhe", sqle);
+        } finally {
+            Yhteydenhallinta.suljeYhteys(yhteys);
+        }
+        return yksikonTapahtumamaarat;
+    }
+            
+    
 
 }

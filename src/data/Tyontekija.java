@@ -61,7 +61,4 @@ public class Tyontekija {
         return "Työntekijän tiedot: \n" + " Työntekijänro: " + tyontekijaNro + "\n Etunimi: " + etunimi + "\n Sukunimi: " + sukunimi + "\n Nimike: " + nimike + "\n Yksikkö: " + yksikko;
     }
     
-    
-    
-    
 }

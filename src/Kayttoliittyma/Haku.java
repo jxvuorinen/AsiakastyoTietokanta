@@ -3,7 +3,9 @@ package Kayttoliittyma;
 import Tietokanta.Tietovarasto;
 import data.Asiakas;
 import data.Kysely;
+import data.PalvelumaaraKysely;
 import data.Tyontekija;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import javafx.event.ActionEvent;
@@ -26,17 +28,17 @@ public class Haku {
     Text lbAsiakasHaku = new Text("Hae asiakkaan tiedot: ");
     TextField tfHetu1 = new TextField();
     Button haeAsiakas = new Button("Hae");
-    Text lbTapahtumaHaku = new Text("Hae asiakkaan saamat palvelut henkilötunnuksella: ");
+    Text lbTapahtumaHaku = new Text("Hae asiakkaan palvelut henkilötunnuksella: ");
     TextField tfHetu2 = new TextField();
     Button haeTapahtumat = new Button("Hae");
     Text lbTyontekijaHaku = new Text("Hae työntekijän tiedot työntekijänumerolla: ");
     TextField tfTyontekijaNro = new TextField();
     Button haeTyontekija = new Button("Hae");
-    Text lbYksikonPalvelut = new Text("Hae yksikön palvelun määrä ja kesto aikavälillä: ");
-    ComboBox cbYksikko = new ComboBox();
+    Text lbYksikonPalvelut = new Text("Hae palvelun tiedot yksiköittäin ajalta: ");
     ComboBox cbPalvelunlaji = new ComboBox();
     DatePicker paivyriAlkaen = new DatePicker();
     DatePicker paivyriPaattyen = new DatePicker();
+    Button haeYksikonPalvelut = new Button("Hae");
 
     TextArea hakutulos = new TextArea("Hakutulokset");
     GridPane hakukentat = new GridPane();
@@ -59,10 +61,10 @@ public class Haku {
         hakukentat.add(tfTyontekijaNro, 1, 2);
         hakukentat.add(haeTyontekija, 2, 2);
         hakukentat.add(lbYksikonPalvelut, 0, 3);
-        hakukentat.add(cbYksikko, 1, 3);
-        hakukentat.add(cbPalvelunlaji, 2, 3);
-        hakukentat.add(paivyriAlkaen, 3, 3);
-        hakukentat.add(paivyriPaattyen, 4, 3);
+        hakukentat.add(cbPalvelunlaji, 1, 3);
+        hakukentat.add(paivyriAlkaen, 2, 3);
+        hakukentat.add(paivyriPaattyen, 3, 3);
+        hakukentat.add(haeYksikonPalvelut, 4, 3);
 
         hakukentat.setHgap(5);
         hakukentat.setVgap(5);
@@ -70,11 +72,9 @@ public class Haku {
 
         cbPalvelunlaji.getItems().addAll(
                 "kotikäynti", "puhelu", "dokumentointi", "saatto", "toimistokäynti",
-                "selvittely", "arviointiryhmän käsittely", "päätöksenteko",
+                "selvittely", "arviointiryhmäkäsittely", "päätöksenteko",
                 "verkostotyö", "muu");
-        cbYksikko.getItems().addAll("Asiakasohjaus", "Gerontologinen sosiaalityö");
-        cbPalvelunlaji.setPromptText("Valitse palvelu");
-        cbYksikko.setPromptText("Valitse yksikkö");
+        cbPalvelunlaji.setPromptText("Palvelu");
         paivyriAlkaen.setPromptText("Alkaen pvm");
         paivyriPaattyen.setPromptText("Päättyen pvm");
 
@@ -85,7 +85,6 @@ public class Haku {
         hakutulos.setWrapText(true);
         hakutulos.setEditable(false);
         hakutulos.setPrefHeight(400);
-        hakukentat.setAlignment(Pos.TOP_CENTER);
 
         //Tallennuspainikkeen toiminnot:
         haeAsiakas.setOnAction(new EventHandler<ActionEvent>() {
@@ -109,7 +108,7 @@ public class Haku {
                 }
             }
         });
-        
+
         haeTyontekija.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -131,7 +130,7 @@ public class Haku {
                 }
             }
         });
-        
+
         haeTapahtumat.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -175,6 +174,44 @@ public class Haku {
                 }
             }
         });
-    }
 
+        haeYksikonPalvelut.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Tietovarasto rekisteri = new Tietovarasto();
+                try {
+                    String palvelunlaji = cbPalvelunlaji.getValue().toString();
+                    LocalDate alkupvm = paivyriAlkaen.getValue();
+                    LocalDate loppupvm = paivyriPaattyen.getValue();
+                    if (palvelunlaji.isEmpty()) {
+                        Alert virheviesti = new Alert(Alert.AlertType.WARNING);
+                        virheviesti.setContentText("Tiedoissa puutteita");
+                        virheviesti.show();
+
+                    } else {
+                        StringBuilder msg = new StringBuilder();
+                        LocalTime kestoYhteensa = LocalTime.of(0, 0);
+                        List<PalvelumaaraKysely> palvelumaarat = rekisteri.haePalveluMaaratYksikoittain(palvelunlaji, alkupvm, loppupvm);
+                        for (PalvelumaaraKysely tapahtuma : palvelumaarat) {
+                            msg.append(tapahtuma.toString());
+                            msg.append("\n" + "" + "\n");
+
+                        }
+                        if (msg.length() == 0) {
+                            hakutulos.setText("Ei tapahtumia");
+                        } else {
+                            //msg.append("Yhteensä: ").append(maara).append(" tapahtumaa\n").append("Tapahtumien kesto yhteensä: ").append(kestoYhteensa);
+                            hakutulos.setText(msg.toString());
+                        }
+
+                    }
+                } catch (Exception e) {
+                    Alert error = new Alert(Alert.AlertType.ERROR);
+                    error.setContentText("Virhe" + e);
+                    error.show();
+                }
+
+            }
+        });
+    }
 }
