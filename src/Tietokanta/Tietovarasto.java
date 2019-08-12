@@ -57,11 +57,16 @@ public class Tietovarasto {
             + "WHERE palvelutapahtuma.palvelunLaji = ? AND ajankohta BETWEEN ? AND ? "
             + "GROUP BY yksikko";
 
-    private String sqlPalveluidenKesto = "SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(palvelutapahtuma.kesto))) "
+    private String sqlPalveluidenKestoAjalla = "SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(palvelutapahtuma.kesto))) "
             + "FROM Tyoskentely JOIN Palvelutapahtuma "
             + "ON tyoskentely.palvelutapahtumaID = palvelutapahtuma.palvelutapahtumaID "
             + "JOIN tyontekija ON tyontekija.tyontekijanro = tyoskentely.tyontekijanro "
             + "WHERE palvelutapahtuma.palvelunLaji = ? AND tyontekija.yksikko = ? AND ajankohta BETWEEN ? AND ?";
+
+    private String sqlPalveluidenKestoYhteensa = "SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(palvelutapahtuma.kesto))) "
+            + "FROM Palvelutapahtuma JOIN Tyoskentely "
+            + "ON palvelutapahtuma.palvelutapahtumaID = tyoskentely.palvelutapahtumaID "
+            + "WHERE palvelutapahtuma.asiakasID = ?";
 
     public void lisaaAsiakas(Asiakas uusiAsiakas) throws Exception {
         Connection yhteys = null;
@@ -270,7 +275,7 @@ public class Tietovarasto {
         return yksikonTapahtumamaarat;
     }
 
-    public PalveluKestoKysely tapahtumienKestoYhteensa(String yksikko, String palvelunLaji, LocalDate alkupvm, LocalDate loppupvm) throws Exception {
+    public PalveluKestoKysely tapahtumienKestoYhteensaAjalla(String yksikko, String palvelunLaji, LocalDate alkupvm, LocalDate loppupvm) throws Exception {
         Connection yhteys = null;
         try {
             yhteys = Yhteydenhallinta.avaaYhteys(ajuri, url, kayttajatunnus, salasana);
@@ -280,11 +285,37 @@ public class Tietovarasto {
         PreparedStatement palvelunkestohaku = null;
         ResultSet tulos = null;
         try {
-            palvelunkestohaku = yhteys.prepareStatement(sqlPalveluidenKesto);
+            palvelunkestohaku = yhteys.prepareStatement(sqlPalveluidenKestoAjalla);
             palvelunkestohaku.setString(1, palvelunLaji);
             palvelunkestohaku.setString(2, yksikko);
             palvelunkestohaku.setObject(3, alkupvm.format(DateTimeFormatter.ISO_DATE));
             palvelunkestohaku.setObject(4, loppupvm.format(DateTimeFormatter.ISO_DATE));
+            tulos = palvelunkestohaku.executeQuery();
+            if (tulos.next()) {
+                return new PalveluKestoKysely(tulos.getObject(1).toString());
+            } else {
+                throw new Exception("Kesto ei saatavilla");
+            }
+
+        } catch (SQLException sqle) {
+            throw new Exception("Hakuvirhe", sqle);
+        } finally {
+            Yhteydenhallinta.suljeYhteys(yhteys);
+        }
+    }
+
+    public PalveluKestoKysely tapahtumienKestoYhteensa(String asiakasId) throws Exception {
+        Connection yhteys = null;
+        try {
+            yhteys = Yhteydenhallinta.avaaYhteys(ajuri, url, kayttajatunnus, salasana);
+        } catch (Exception e) {
+            throw new Exception("Tietovarasto ei ole auki.", e);
+        }
+        PreparedStatement palvelunkestohaku = null;
+        ResultSet tulos = null;
+        try {
+            palvelunkestohaku = yhteys.prepareStatement(sqlPalveluidenKestoYhteensa);
+            palvelunkestohaku.setString(1, asiakasId);
             tulos = palvelunkestohaku.executeQuery();
             if (tulos.next()) {
                 return new PalveluKestoKysely(tulos.getObject(1).toString());

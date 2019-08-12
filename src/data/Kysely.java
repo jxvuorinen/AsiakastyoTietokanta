@@ -24,6 +24,47 @@ public class Kysely {
     public LocalTime getKesto() {
         return kesto;
     }
+
+    public String getTyontekijaNimeke() {
+        return tyontekijaNimeke;
+    }
+
+    public void setTyontekijaNimeke(String tyontekijaNimeke) {
+        this.tyontekijaNimeke = tyontekijaNimeke;
+    }
+
+    public String getYksikko() {
+        return yksikko;
+    }
+
+    public void setYksikko(String yksikko) {
+        this.yksikko = yksikko;
+    }
+
+    public LocalDateTime getAjankohta() {
+        return ajankohta;
+    }
+
+    public void setAjankohta(LocalDateTime ajankohta) {
+        this.ajankohta = ajankohta;
+    }
+
+    public String getPalvelunLaji() {
+        return palvelunLaji;
+    }
+
+    public void setPalvelunLaji(String palvelunLaji) {
+        this.palvelunLaji = palvelunLaji;
+    }
+
+    public String getKuvaus() {
+        return kuvaus;
+    }
+
+    public void setKuvaus(String kuvaus) {
+        this.kuvaus = kuvaus;
+    }
+    
     
 
     @Override
