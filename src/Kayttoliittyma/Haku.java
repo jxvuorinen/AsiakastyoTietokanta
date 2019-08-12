@@ -92,6 +92,8 @@ public class Haku {
         haeAsiakas.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                tfHetu2.setText("");
+                tfTyontekijaNro.setText("");
                 Tietovarasto rekisteri = new Tietovarasto();
                 try {
                     String asiakasId = tfHetu1.getText();
@@ -114,6 +116,8 @@ public class Haku {
         haeTyontekija.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                tfHetu1.setText("");
+                tfHetu2.setText("");
                 Tietovarasto rekisteri = new Tietovarasto();
                 try {
                     String tyontekijanro = tfTyontekijaNro.getText();
@@ -136,6 +140,8 @@ public class Haku {
         haeTapahtumat.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                tfHetu1.setText("");
+                tfTyontekijaNro.setText("");
                 Tietovarasto rekisteri = new Tietovarasto();
                 try {
                     String asiakasId = tfHetu2.getText();
@@ -177,11 +183,12 @@ public class Haku {
         }
         );
 
-        haeYksikonPalvelut.setOnAction(
-                new EventHandler<ActionEvent>() {
+        haeYksikonPalvelut.setOnAction(new EventHandler<ActionEvent>() {
             @Override
-            public void handle(ActionEvent event
-            ) {
+            public void handle(ActionEvent event) {
+                tfHetu1.setText("");
+                tfHetu2.setText("");
+                tfTyontekijaNro.setText("");
                 Tietovarasto rekisteri = new Tietovarasto();
                 try {
                     String palvelunlaji = cbPalvelunlaji.getValue().toString();
@@ -198,7 +205,7 @@ public class Haku {
                         for (PalvelumaaraKysely tapahtuma : palvelumaarat) {
                             msg.append(tapahtuma.toString());
                             PalveluKestoKysely kesto = rekisteri.tapahtumienKestoYhteensaAjalla(tapahtuma.getYksikko(), palvelunlaji, alkupvm, loppupvm);
-                            msg.append("\n Palvelua ").append(palvelunlaji).append(" annettu yhteensä: ").append(kesto.toString().substring(0, 5)).append(" tuntia. \n");
+                            msg.append("\n Palvelua ").append(palvelunlaji).append(" annettu yhteensä: ").append(kesto.toString().substring(0, 5)).append(" tuntia. \n" + "" + "\n");
                             hakutulos.setText(msg.toString());
 
                         }
