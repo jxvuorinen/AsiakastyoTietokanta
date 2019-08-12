@@ -39,15 +39,13 @@ public class Tietovarasto {
 
     private String sqlLisaaTyoskentely = "INSERT INTO tyoskentely(tyontekijanro, palvelutapahtumaID) VALUES (?,?)";
 
-    private String sqlTapahtumahaku = "SELECT tyontekija.tyontekijaNimeke, yksikko, ajankohta, palvelunLaji, kesto, kuvaus"
-            + " FROM Asiakas JOIN Palvelutapahtuma"
-            + " ON asiakas.asiakasID = palvelutapahtuma.asiakasID"
-            + " JOIN Tyoskentely"
-            + " On tyoskentely.palvelutapahtumaID = palvelutapahtuma.palvelutapahtumaID"
-            + " JOIN tyontekija"
-            + " ON tyoskentely.tyontekijanro = tyontekija.tyontekijanro"
-            + " WHERE asiakas.asiakasID = ?"
-            + " ORDER BY ajankohta ASC";
+    private String sqlTapahtumahaku = "SELECT tyontekija.tyontekijaNimeke, yksikko, ajankohta, palvelunLaji, kesto, kuvaus "
+            + "FROM Palvelutapahtuma JOIN Tyoskentely "
+            + "On tyoskentely.palvelutapahtumaID = palvelutapahtuma.palvelutapahtumaID "
+            + "JOIN tyontekija "
+            + "ON tyoskentely.tyontekijanro = tyontekija.tyontekijanro "
+            + "WHERE palvelutapahtuma.asiakasID = ?"
+            + "ORDER BY ajankohta ASC";
 
     private String sqlPalvelutYksikoittain = "SELECT yksikko, COUNT(palvelutapahtuma.palvelunLaji) "
             + "FROM Tyoskentely JOIN Palvelutapahtuma "

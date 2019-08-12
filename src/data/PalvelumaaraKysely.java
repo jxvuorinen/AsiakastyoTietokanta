@@ -28,7 +28,7 @@ public class PalvelumaaraKysely {
 
     @Override
     public String toString() {
-        return "Yksikkö: " + yksikko + ", palvelutapahtumien määrä haetulla ajalla: " + tapahtumienMaara;
+        return "Yksikkö: " + yksikko + "\n palvelutapahtumien määrä haetulla ajalla: " + tapahtumienMaara;
     }
     
     

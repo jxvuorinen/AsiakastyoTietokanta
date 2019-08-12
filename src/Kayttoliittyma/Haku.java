@@ -8,6 +8,7 @@ import data.PalvelumaaraKysely;
 import data.Tyontekija;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -91,12 +92,17 @@ public class Haku {
         scrollPane.setContent(hakutulos);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
         //Tallennuspainikkeen toiminnot:
         haeAsiakas.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 tfHetu2.setText("");
                 tfTyontekijaNro.setText("");
+                paivyriAlkaen.getEditor().clear();
+                paivyriPaattyen.getEditor().clear();
+                cbPalvelunlaji.setValue(null);
                 Tietovarasto rekisteri = new Tietovarasto();
                 try {
                     String asiakasId = tfHetu1.getText();
@@ -107,7 +113,6 @@ public class Haku {
                     } else {
                         Asiakas haettu = rekisteri.haeAsiakas(asiakasId);
                         hakutulos.setText(haettu.toString());
-                        hakutulos.appendText("");
                     }
                 } catch (Exception e) {
                     Alert error = new Alert(Alert.AlertType.ERROR);
@@ -122,6 +127,9 @@ public class Haku {
             public void handle(ActionEvent event) {
                 tfHetu1.setText("");
                 tfHetu2.setText("");
+                paivyriAlkaen.getEditor().clear();
+                paivyriPaattyen.getEditor().clear();
+                cbPalvelunlaji.setValue(null);
                 Tietovarasto rekisteri = new Tietovarasto();
                 try {
                     String tyontekijanro = tfTyontekijaNro.getText();
@@ -132,7 +140,6 @@ public class Haku {
                     } else {
                         Tyontekija haettu = rekisteri.haeTyontekija(tyontekijanro);
                         hakutulos.setText(haettu.toString());
-                        hakutulos.appendText("");
                     }
                 } catch (Exception e) {
                     Alert error = new Alert(Alert.AlertType.ERROR);
@@ -147,6 +154,9 @@ public class Haku {
             public void handle(ActionEvent event) {
                 tfHetu1.setText("");
                 tfTyontekijaNro.setText("");
+                paivyriAlkaen.getEditor().clear();
+                paivyriPaattyen.getEditor().clear();
+                cbPalvelunlaji.setValue(null);
                 Tietovarasto rekisteri = new Tietovarasto();
                 try {
                     String asiakasId = tfHetu2.getText();
@@ -165,8 +175,8 @@ public class Haku {
                             virheviesti.show();
                         } else {
                             List<Kysely> kyselytulos = rekisteri.haeTapahtumat(haettu);
-                            msg.append("Asiakkaan " + haettu.getAsiakasId() + " " + haettu.getEtunimi() + " " + 
-                                        haettu.getSukunimi() + " saamat palvelut: \n");
+                            msg.append("Asiakkaan " + haettu.getAsiakasId() + " " + haettu.getEtunimi() + " "
+                                    + haettu.getSukunimi() + " saamat palvelut: \n");
                             for (Kysely tapahtuma : kyselytulos) {
                                 msg.append(tapahtuma.toString());
                                 msg.append("\n" + "" + "\n");
@@ -178,7 +188,6 @@ public class Haku {
                                     .append("Asiakkaan saamien palvelutapahtumien kesto yhteensä: ")
                                     .append(kestoYhteensa.toString().substring(0, 5)).append(" tuntia. \n");
                             hakutulos.setText(msg.toString());
-                            hakutulos.appendText("");
                         }
 
                     }
@@ -210,19 +219,17 @@ public class Haku {
                     } else {
                         StringBuilder msg = new StringBuilder();
                         List<PalvelumaaraKysely> palvelumaarat = rekisteri.haePalveluMaaratYksikoittain(palvelunlaji, alkupvm, loppupvm);
-                        msg.append("Palvelutapahtumat yksiköittäin aikavälillä " + alkupvm + "-" + loppupvm + ":\n");
+                        msg.append("Palvelutapahtumat yksiköittäin aikavälillä " + alkupvm.format(formatter) + "-" + loppupvm.format(formatter) + ":\n\n");
                         for (PalvelumaaraKysely tapahtuma : palvelumaarat) {
                             msg.append(tapahtuma.toString());
                             PalveluKestoKysely kesto = rekisteri.tapahtumienKestoYhteensaAjalla(tapahtuma.getYksikko(), palvelunlaji, alkupvm, loppupvm);
-                            msg.append("\n Palvelua ").append(palvelunlaji).append(" annettu yhteensä: ").append(kesto.toString().substring(0, 5)).append(" tuntia. \n" + "" + "\n");
+                            msg.append("\n palvelua annettu yhteensä: ").append(kesto.toString().substring(0, 5)).append(" tuntia. \n" + "" + "\n");
                             hakutulos.setText(msg.toString());
-                            hakutulos.appendText("");
 
                         }
 
-                        if (msg.length() == 0) {
+                        if (palvelumaarat.isEmpty()) {
                             hakutulos.setText("Ei tapahtumia");
-                            hakutulos.appendText("");
                         }
                     }
                 } catch (Exception e) {

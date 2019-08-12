@@ -1,7 +1,6 @@
 
 package data;
 
-import javafx.util.Duration;
 
 public class PalveluKestoKysely {
     private Object kesto;

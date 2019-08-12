@@ -23,7 +23,10 @@ public class TyontekijanLisays {
     private Label lbNimike = new Label("Työntekijänimike: ");
     private TextField tfNimike = new TextField();
     private Label lbYksikko = new Label("Yksikkö: ");
-    private ChoiceBox<String> cbYksikko = new ChoiceBox<>(FXCollections.observableArrayList("Asiakasohjaus", "Geso"));
+    private ChoiceBox<String> cbYksikko = new ChoiceBox<>(FXCollections.observableArrayList("Gerontologinen sosiaalityö/Pohjoinen",
+            "Gerontologinen sosiaalityö/Etelä", "Gerontologinen sosiaalityö/Itä", 
+            "Gerontologinen sosiaalityö/Länsi", "HelppiSeniori/Länsi", "HelppiSeniori/Etelä", "HelppiSeniori/Itä", 
+            "HelppiSeniori/Pohjoinen"));
     private Button talleta = new Button("Talleta");
     GridPane TLomakekentat = new GridPane();
 
