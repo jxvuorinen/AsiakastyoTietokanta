@@ -3,6 +3,7 @@ package Tietokanta;
 import com.mysql.jdbc.Statement;
 import data.Asiakas;
 import data.Kysely;
+import data.PalveluKestoKysely;
 import data.PalvelumaaraKysely;
 import data.Palvelutapahtuma;
 import data.Tyontekija;
@@ -29,7 +30,7 @@ public class Tietovarasto {
     private String sqlLisaaAsiakas = "INSERT INTO asiakas VALUES (?,?,?,?,?)";
 
     private String sqlHaeAsiakas = "SELECT * FROM asiakas WHERE asiakasID = ?";
-    
+
     private String sqlHaeTyontekija = "SELECT * FROM tyontekija WHERE tyontekijanro = ?";
 
     private String sqlLisaaTyontekija = "INSERT INTO tyontekija(tyontekijanro, yksikko, tyontekijaNimeke, etunimi, sukunimi) VALUES (?,?,?,?,?)";
@@ -47,14 +48,20 @@ public class Tietovarasto {
             + " ON tyoskentely.tyontekijanro = tyontekija.tyontekijanro"
             + " WHERE asiakas.asiakasID = ?"
             + " ORDER BY ajankohta ASC";
-    
-    private String sqlPalvelutYksikoittain ="SELECT yksikko, COUNT(palvelutapahtuma.palvelunLaji) " +
-"FROM Tyoskentely JOIN Palvelutapahtuma " +
-"ON tyoskentely.palvelutapahtumaID = palvelutapahtuma.palvelutapahtumaID " +
-"JOIN tyontekija " +
-"ON tyontekija.tyontekijanro = tyoskentely.tyontekijanro " +
-"WHERE palvelutapahtuma.palvelunLaji = ? AND ajankohta BETWEEN ? AND ? " +
-"GROUP BY yksikko";
+
+    private String sqlPalvelutYksikoittain = "SELECT yksikko, COUNT(palvelutapahtuma.palvelunLaji) "
+            + "FROM Tyoskentely JOIN Palvelutapahtuma "
+            + "ON tyoskentely.palvelutapahtumaID = palvelutapahtuma.palvelutapahtumaID "
+            + "JOIN tyontekija "
+            + "ON tyontekija.tyontekijanro = tyoskentely.tyontekijanro "
+            + "WHERE palvelutapahtuma.palvelunLaji = ? AND ajankohta BETWEEN ? AND ? "
+            + "GROUP BY yksikko";
+
+    private String sqlPalveluidenKesto = "SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(palvelutapahtuma.kesto))) "
+            + "FROM Tyoskentely JOIN Palvelutapahtuma "
+            + "ON tyoskentely.palvelutapahtumaID = palvelutapahtuma.palvelutapahtumaID "
+            + "JOIN tyontekija ON tyontekija.tyontekijanro = tyoskentely.tyontekijanro "
+            + "WHERE palvelutapahtuma.palvelunLaji = ? AND tyontekija.yksikko = ? AND ajankohta BETWEEN ? AND ?";
 
     public void lisaaAsiakas(Asiakas uusiAsiakas) throws Exception {
         Connection yhteys = null;
@@ -181,7 +188,7 @@ public class Tietovarasto {
         }
 
     }
-    
+
     public Tyontekija haeTyontekija(String tyontekijanro) throws Exception {
         Connection yhteys = null;
         try {
@@ -235,6 +242,7 @@ public class Tietovarasto {
         }
         return tapahtumat;
     }
+
     public List<PalvelumaaraKysely> haePalveluMaaratYksikoittain(String palvelunlaji, LocalDate alkupvm, LocalDate loppupvm) throws Exception {
         Connection yhteys = null;
         List<PalvelumaaraKysely> yksikonTapahtumamaarat = new ArrayList<>();
@@ -251,17 +259,43 @@ public class Tietovarasto {
             palvelumaarienHaku.setObject(2, alkupvm.format(DateTimeFormatter.ISO_DATE));
             palvelumaarienHaku.setObject(3, loppupvm.format(DateTimeFormatter.ISO_DATE));
             tulos = palvelumaarienHaku.executeQuery();
-             while (tulos.next()) {
+            while (tulos.next()) {
                 yksikonTapahtumamaarat.add(new PalvelumaaraKysely(tulos.getString(1), tulos.getInt(2)));
             }
-             } catch (SQLException sqle) {
+        } catch (SQLException sqle) {
             throw new Exception("Hakuvirhe", sqle);
         } finally {
             Yhteydenhallinta.suljeYhteys(yhteys);
         }
         return yksikonTapahtumamaarat;
     }
-            
-    
 
+    public PalveluKestoKysely tapahtumienKestoYhteensa(String yksikko, String palvelunLaji, LocalDate alkupvm, LocalDate loppupvm) throws Exception {
+        Connection yhteys = null;
+        try {
+            yhteys = Yhteydenhallinta.avaaYhteys(ajuri, url, kayttajatunnus, salasana);
+        } catch (Exception e) {
+            throw new Exception("Tietovarasto ei ole auki.", e);
+        }
+        PreparedStatement palvelunkestohaku = null;
+        ResultSet tulos = null;
+        try {
+            palvelunkestohaku = yhteys.prepareStatement(sqlPalveluidenKesto);
+            palvelunkestohaku.setString(1, palvelunLaji);
+            palvelunkestohaku.setString(2, yksikko);
+            palvelunkestohaku.setObject(3, alkupvm.format(DateTimeFormatter.ISO_DATE));
+            palvelunkestohaku.setObject(4, loppupvm.format(DateTimeFormatter.ISO_DATE));
+            tulos = palvelunkestohaku.executeQuery();
+            if (tulos.next()) {
+                return new PalveluKestoKysely(tulos.getObject(1).toString());
+            } else {
+                throw new Exception("Kesto ei saatavilla");
+            }
+
+        } catch (SQLException sqle) {
+            throw new Exception("Hakuvirhe", sqle);
+        } finally {
+            Yhteydenhallinta.suljeYhteys(yhteys);
+        }
+    }
 }

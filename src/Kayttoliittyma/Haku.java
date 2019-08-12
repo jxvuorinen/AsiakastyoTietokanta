@@ -3,6 +3,7 @@ package Kayttoliittyma;
 import Tietokanta.Tietovarasto;
 import data.Asiakas;
 import data.Kysely;
+import data.PalveluKestoKysely;
 import data.PalvelumaaraKysely;
 import data.Tyontekija;
 import java.time.LocalDate;
@@ -190,20 +191,18 @@ public class Haku {
 
                     } else {
                         StringBuilder msg = new StringBuilder();
-                        LocalTime kestoYhteensa = LocalTime.of(0, 0);
                         List<PalvelumaaraKysely> palvelumaarat = rekisteri.haePalveluMaaratYksikoittain(palvelunlaji, alkupvm, loppupvm);
                         for (PalvelumaaraKysely tapahtuma : palvelumaarat) {
                             msg.append(tapahtuma.toString());
-                            msg.append("\n" + "" + "\n");
+                            PalveluKestoKysely kesto = rekisteri.tapahtumienKestoYhteensa(tapahtuma.getYksikko(), palvelunlaji, alkupvm, loppupvm);
+                            msg.append("\n").append(kesto.toString()).append("\n");
+                            hakutulos.setText(msg.toString());
 
                         }
+
                         if (msg.length() == 0) {
                             hakutulos.setText("Ei tapahtumia");
-                        } else {
-                            //msg.append("Yhteensä: ").append(maara).append(" tapahtumaa\n").append("Tapahtumien kesto yhteensä: ").append(kestoYhteensa);
-                            hakutulos.setText(msg.toString());
                         }
-
                     }
                 } catch (Exception e) {
                     Alert error = new Alert(Alert.AlertType.ERROR);
