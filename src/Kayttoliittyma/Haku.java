@@ -195,7 +195,7 @@ public class Haku {
                         for (PalvelumaaraKysely tapahtuma : palvelumaarat) {
                             msg.append(tapahtuma.toString());
                             PalveluKestoKysely kesto = rekisteri.tapahtumienKestoYhteensa(tapahtuma.getYksikko(), palvelunlaji, alkupvm, loppupvm);
-                            msg.append("\n Palvelua annettu yhteensä: ").append(kesto.toString().substring(0, 5)).append(" tuntia. \n");
+                            msg.append("\n Palvelua ").append(palvelunlaji).append(" annettu yhteensä: ").append(kesto.toString().substring(0, 5)).append(" tuntia. \n");
                             hakutulos.setText(msg.toString());
 
                         }
