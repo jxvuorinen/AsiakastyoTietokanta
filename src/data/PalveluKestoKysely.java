@@ -12,7 +12,7 @@ public class PalveluKestoKysely {
     }
 
     public Object getKesto() {
-        return kesto;
+        return this.kesto;
     }
 
     public void setKesto(Object kesto) {
@@ -21,7 +21,7 @@ public class PalveluKestoKysely {
 
     @Override
     public String toString() {
-        return "Palvelua annettu yhteensä: " + kesto + " tuntia.";
+        return "" + kesto;
     }
     
     
