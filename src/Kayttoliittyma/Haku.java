@@ -17,6 +17,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -44,6 +45,7 @@ public class Haku {
     TextArea hakutulos = new TextArea("Hakutulokset");
     GridPane hakukentat = new GridPane();
     BorderPane uusiPane = new BorderPane();
+    ScrollPane scrollPane = new ScrollPane();
 
     //Konstruktori
     public Haku(BorderPane nakyma) {
@@ -80,13 +82,14 @@ public class Haku {
         paivyriPaattyen.setPromptText("Päättyen pvm");
 
         uusiPane.setTop(hakukentat);
-        uusiPane.setBottom(hakutulos);
+        uusiPane.setBottom(scrollPane);
 
         this.nakyma.setCenter(uusiPane);
         hakutulos.setWrapText(true);
         hakutulos.setEditable(false);
-        hakutulos.autosize();
-        hakutulos.setPrefHeight(400);
+        hakutulos.setPrefWidth(900);
+        scrollPane.setContent(hakutulos);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
         //Tallennuspainikkeen toiminnot:
         haeAsiakas.setOnAction(new EventHandler<ActionEvent>() {
@@ -104,6 +107,7 @@ public class Haku {
                     } else {
                         Asiakas haettu = rekisteri.haeAsiakas(asiakasId);
                         hakutulos.setText(haettu.toString());
+                        hakutulos.appendText("");
                     }
                 } catch (Exception e) {
                     Alert error = new Alert(Alert.AlertType.ERROR);
@@ -128,6 +132,7 @@ public class Haku {
                     } else {
                         Tyontekija haettu = rekisteri.haeTyontekija(tyontekijanro);
                         hakutulos.setText(haettu.toString());
+                        hakutulos.appendText("");
                     }
                 } catch (Exception e) {
                     Alert error = new Alert(Alert.AlertType.ERROR);
@@ -160,6 +165,8 @@ public class Haku {
                             virheviesti.show();
                         } else {
                             List<Kysely> kyselytulos = rekisteri.haeTapahtumat(haettu);
+                            msg.append("Asiakkaan " + haettu.getAsiakasId() + " " + haettu.getEtunimi() + " " + 
+                                        haettu.getSukunimi() + " saamat palvelut: \n");
                             for (Kysely tapahtuma : kyselytulos) {
                                 msg.append(tapahtuma.toString());
                                 msg.append("\n" + "" + "\n");
@@ -167,10 +174,11 @@ public class Haku {
 
                             String maara = Integer.toString(kyselytulos.size());
                             kestoYhteensa = rekisteri.tapahtumienKestoYhteensa(asiakasId);
-                            msg.append("\nYhteensä ").append(maara).append(" palvelutapahtumaa.\n")
+                            msg.append("Yhteensä ").append(maara).append(" palvelutapahtumaa.\n")
                                     .append("Asiakkaan saamien palvelutapahtumien kesto yhteensä: ")
                                     .append(kestoYhteensa.toString().substring(0, 5)).append(" tuntia. \n");
                             hakutulos.setText(msg.toString());
+                            hakutulos.appendText("");
                         }
 
                     }
@@ -202,16 +210,19 @@ public class Haku {
                     } else {
                         StringBuilder msg = new StringBuilder();
                         List<PalvelumaaraKysely> palvelumaarat = rekisteri.haePalveluMaaratYksikoittain(palvelunlaji, alkupvm, loppupvm);
+                        msg.append("Palvelutapahtumat yksiköittäin aikavälillä " + alkupvm + "-" + loppupvm + ":\n");
                         for (PalvelumaaraKysely tapahtuma : palvelumaarat) {
                             msg.append(tapahtuma.toString());
                             PalveluKestoKysely kesto = rekisteri.tapahtumienKestoYhteensaAjalla(tapahtuma.getYksikko(), palvelunlaji, alkupvm, loppupvm);
                             msg.append("\n Palvelua ").append(palvelunlaji).append(" annettu yhteensä: ").append(kesto.toString().substring(0, 5)).append(" tuntia. \n" + "" + "\n");
                             hakutulos.setText(msg.toString());
+                            hakutulos.appendText("");
 
                         }
 
                         if (msg.length() == 0) {
                             hakutulos.setText("Ei tapahtumia");
+                            hakutulos.appendText("");
                         }
                     }
                 } catch (Exception e) {

@@ -29,7 +29,7 @@ public class Paaikkuna extends Application {
         //BorderPanen yläosaan napit
         BorderPane asettelu = new BorderPane();
         asettelu.setTop(napit);
-        asettelu.setPrefSize(1000, 400);
+        asettelu.setPrefSize(900, 400);
 
         //Näytetään aluksi aloitusnäkymä BorderPanen keskellä
         Text ohjeteksti = new Text("Tervetuloa hallinnoimaan asiakastyön tallennusjärjestelmää! \n"
