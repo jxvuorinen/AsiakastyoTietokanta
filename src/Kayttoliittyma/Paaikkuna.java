@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -34,6 +35,7 @@ public class Paaikkuna extends Application {
         //Näytetään aluksi aloitusnäkymä BorderPanen keskellä
         Text ohjeteksti = new Text("Tervetuloa hallinnoimaan asiakastyön tallennusjärjestelmää! \n"
                 + "Valitse ylävalikosta, mitä tietoa haluat tallentaa.");
+        ohjeteksti.setFont(Font.font ("Calibri", 20));
         asettelu.setCenter(ohjeteksti);
 
         Scene aloitusNakyma = new Scene(asettelu);
