@@ -14,9 +14,9 @@ public class Yhteydenhallinta {
             Class.forName(ajuri).newInstance();
             return DriverManager.getConnection(url, kayttajatunnus, salasana);
         } catch (SQLException sqle) {
-            throw new Exception("Yhteyden avaaminen ei onnistu", sqle);
+            throw new Exception("Yhteyden avaaminen ei onnistu.", sqle);
         } catch (ClassNotFoundException e) {
-            throw new Exception("Ajuria ei löytynyt", e);
+            throw new Exception("Ajuria ei löytynyt.", e);
         }
     }
 

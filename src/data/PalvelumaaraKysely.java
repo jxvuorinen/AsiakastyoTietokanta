@@ -30,6 +30,4 @@ public class PalvelumaaraKysely {
     public String toString() {
         return "Yksikkö: " + yksikko + "\n palvelutapahtumien määrä haetulla ajalla: " + tapahtumienMaara;
     }
-    
-    
 }

@@ -22,7 +22,4 @@ public class PalveluKestoKysely {
     public String toString() {
         return "" + kesto;
     }
-    
-    
-    
 }
