@@ -2,6 +2,8 @@ package Kayttoliittyma;
 
 import Tietokanta.Tietovarasto;
 import data.Asiakas;
+import data.Kayttaja;
+import javafx.beans.binding.Bindings;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -25,15 +27,19 @@ public class AsiakkaanLisays {
     private TextField tfAsuinalue = new TextField();
     private Button talletaA = new Button("Talleta");
     private GridPane AsLomakekentat = new GridPane();
+    
+    private Kayttaja kayttaja;
 
     //Konstruktori
-    public AsiakkaanLisays(BorderPane aloitusnakyma) {
+    public AsiakkaanLisays(BorderPane aloitusnakyma, Kayttaja kayttaja) {
         this.nakyma = aloitusnakyma;
+        this.kayttaja = kayttaja;
         asetteleKomponentit();
     }
 
     private void asetteleKomponentit() {
         //Luodaan asiakastallennusnäkymä ja tallennuspainike
+        AsLomakekentat.getStyleClass().add("lomake");
         CBsukupuoli.getItems().addAll("mies", "nainen", "muu");
         AsLomakekentat.add(lbEtunimi, 0, 0);
         AsLomakekentat.add(tfEtunimi, 1, 0);
@@ -46,13 +52,15 @@ public class AsiakkaanLisays {
         AsLomakekentat.add(lbAsuinalue, 0, 4);
         AsLomakekentat.add(tfAsuinalue, 1, 4);
         AsLomakekentat.add(talletaA, 1, 5);
+        
+        AsLomakekentat.styleProperty().bind(Bindings.concat("-fx-font-size: 15px;"));
 
         //Näytetään ikkuna
         this.nakyma.setCenter(AsLomakekentat);
 
         //Tallennuspainikkeen toiminto:
         talletaA.setOnAction((event) -> {
-            Tietovarasto rekisteri = new Tietovarasto();
+            Tietovarasto rekisteri = new Tietovarasto(this.kayttaja.getKayttajatunnus(), this.kayttaja.getSalasana());
             try {
                 String etunimi = tfEtunimi.getText();
                 String sukunimi = tfSukunimi.getText();

@@ -1,0 +1,22 @@
+.napit {
+    -fx-background-color: #730073;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+}
+
+.asettelu {
+    -fx-padding: 10px;
+    -fx-background-color: #ffe8ff;
+}
+
+.lomake {
+    -fx-padding: 10;
+    -fx-hgap: 10;
+    -fx-vgap: 10;
+    -fx-background-color: white;
+    -fx-background-radius: 5.0;
+    -fx-background-insets: 0.0 5.0 0.0 5.0;
+}
+.scroll-pane > .viewport{ 
+    -fx-background-color: #ffe8ff;
+}

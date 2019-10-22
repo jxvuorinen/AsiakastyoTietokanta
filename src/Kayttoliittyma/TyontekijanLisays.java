@@ -1,7 +1,9 @@
 package Kayttoliittyma;
 
 import Tietokanta.Tietovarasto;
+import data.Kayttaja;
 import data.Tyontekija;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -24,15 +26,18 @@ public class TyontekijanLisays {
     private TextField tfNimike = new TextField();
     private Label lbYksikko = new Label("Yksikkö: ");
     private ChoiceBox<String> cbYksikko = new ChoiceBox<>(FXCollections.observableArrayList("Gerontologinen sosiaalityö/Pohjoinen",
-            "Gerontologinen sosiaalityö/Etelä", "Gerontologinen sosiaalityö/Itä", 
-            "Gerontologinen sosiaalityö/Länsi", "HelppiSeniori/Länsi", "HelppiSeniori/Etelä", "HelppiSeniori/Itä", 
+            "Gerontologinen sosiaalityö/Etelä", "Gerontologinen sosiaalityö/Itä",
+            "Gerontologinen sosiaalityö/Länsi", "HelppiSeniori/Länsi", "HelppiSeniori/Etelä", "HelppiSeniori/Itä",
             "HelppiSeniori/Pohjoinen"));
     private Button talleta = new Button("Talleta");
     GridPane TLomakekentat = new GridPane();
+    
+    private Kayttaja kayttaja;
 
     //Konstruktori
-    public TyontekijanLisays(BorderPane nakyma) {
+    public TyontekijanLisays(BorderPane nakyma, Kayttaja kayttaja) {
         this.nakyma = nakyma;
+        this.kayttaja = kayttaja;
         asetteleKomponentit();
     }
 
@@ -49,11 +54,14 @@ public class TyontekijanLisays {
         TLomakekentat.add(cbYksikko, 1, 4);
         TLomakekentat.add(talleta, 1, 6);
 
+        TLomakekentat.getStyleClass().add("lomake");
+        TLomakekentat.styleProperty().bind(Bindings.concat("-fx-font-size: 15px;"));
+
         this.nakyma.setCenter(TLomakekentat);
 
         //Tallennuspainikkeen toiminto:
         talleta.setOnAction((event) -> {
-            Tietovarasto rekisteri = new Tietovarasto();
+            Tietovarasto rekisteri = new Tietovarasto(this.kayttaja.getKayttajatunnus(), this.kayttaja.getSalasana());
             try {
                 String etunimi = tfEtunimi.getText();
                 String sukunimi = tfSukunimi.getText();

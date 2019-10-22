@@ -23,8 +23,8 @@ public class Tietovarasto {
 
     private String ajuri = "com.mysql.jdbc.Driver";
     private String url = "jdbc:mysql://localhost/asiakastyo";
-    private String kayttajatunnus = "root";
-    private String salasana = "";
+    private String kayttajatunnus;
+    private String salasana;
 
     private String sqlLisaaAsiakas = "INSERT INTO asiakas VALUES (?,?,?,?,?)";
 
@@ -64,6 +64,11 @@ public class Tietovarasto {
             + "FROM Palvelutapahtuma JOIN Tyoskentely "
             + "ON palvelutapahtuma.palvelutapahtumaID = tyoskentely.palvelutapahtumaID "
             + "WHERE palvelutapahtuma.asiakasID = ?";
+    
+    public Tietovarasto(String kayttajatunnus, String salasana) {
+        this.kayttajatunnus = kayttajatunnus;
+        this.salasana = salasana;
+    }
 
     public void lisaaAsiakas(Asiakas uusiAsiakas) throws Exception {
         Connection yhteys = null;

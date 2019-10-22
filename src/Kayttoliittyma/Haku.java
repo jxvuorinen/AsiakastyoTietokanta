@@ -2,6 +2,7 @@ package Kayttoliittyma;
 
 import Tietokanta.Tietovarasto;
 import data.Asiakas;
+import data.Kayttaja;
 import data.Kysely;
 import data.PalveluKestoKysely;
 import data.PalvelumaaraKysely;
@@ -12,6 +13,11 @@ import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -22,6 +28,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 public class Haku {
 
@@ -40,15 +47,19 @@ public class Haku {
     DatePicker paivyriAlkaen = new DatePicker();
     DatePicker paivyriPaattyen = new DatePicker();
     Button haeYksikonPalvelut = new Button("Hae");
+    Button btKaavio = new Button("Näytä kaavio");
 
     TextArea hakutulos = new TextArea("Hakutulokset");
     GridPane hakukentat = new GridPane();
     BorderPane uusiPane = new BorderPane();
     ScrollPane scrollPane = new ScrollPane();
 
+    private Kayttaja kayttaja;
+
     //Konstruktori
-    public Haku(BorderPane nakyma) {
+    public Haku(BorderPane nakyma, Kayttaja kayttaja) {
         this.nakyma = nakyma;
+        this.kayttaja = kayttaja;
         asetteleKomponentit();
     }
 
@@ -82,13 +93,18 @@ public class Haku {
 
         uusiPane.setTop(hakukentat);
         uusiPane.setBottom(scrollPane);
-
+        uusiPane.setRight(btKaavio);
         this.nakyma.setCenter(uusiPane);
+
         hakutulos.setWrapText(true);
         hakutulos.setEditable(false);
-        hakutulos.setPrefWidth(900);
+        hakutulos.setPrefWidth(600);
+        hakutulos.setStyle("-fx-font-weight: bold;");
         scrollPane.setContent(hakutulos);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setPrefWidth(600);
+        scrollPane.getStylesheets().add("/Kayttoliittyma/styles.css");
+        scrollPane.getStyleClass().add("edge-to-edge");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -101,7 +117,7 @@ public class Haku {
                 paivyriAlkaen.getEditor().clear();
                 paivyriPaattyen.getEditor().clear();
                 cbPalvelunlaji.setValue(null);
-                Tietovarasto rekisteri = new Tietovarasto();
+                Tietovarasto rekisteri = new Tietovarasto(kayttaja.getKayttajatunnus(), kayttaja.getSalasana());
                 try {
                     String asiakasId = tfHetu1.getText();
                     if (asiakasId.isEmpty()) {
@@ -128,7 +144,7 @@ public class Haku {
                 paivyriAlkaen.getEditor().clear();
                 paivyriPaattyen.getEditor().clear();
                 cbPalvelunlaji.setValue(null);
-                Tietovarasto rekisteri = new Tietovarasto();
+                Tietovarasto rekisteri = new Tietovarasto(kayttaja.getKayttajatunnus(), kayttaja.getSalasana());
                 try {
                     String tyontekijanro = tfTyontekijaNro.getText();
                     if (tyontekijanro.isEmpty()) {
@@ -155,7 +171,7 @@ public class Haku {
                 paivyriAlkaen.getEditor().clear();
                 paivyriPaattyen.getEditor().clear();
                 cbPalvelunlaji.setValue(null);
-                Tietovarasto rekisteri = new Tietovarasto();
+                Tietovarasto rekisteri = new Tietovarasto(kayttaja.getKayttajatunnus(), kayttaja.getSalasana());
                 try {
                     String asiakasId = tfHetu2.getText();
                     if (asiakasId.isEmpty()) {
@@ -173,8 +189,7 @@ public class Haku {
                             virheviesti.show();
                         } else {
                             List<Kysely> kyselytulos = rekisteri.haeTapahtumat(haettu);
-                            msg.append("Asiakkaan " + haettu.getAsiakasId() + " " + haettu.getEtunimi() + " "
-                                    + haettu.getSukunimi() + " saamat palvelut: \n");
+                            msg.append("Asiakkaan ").append(haettu.getAsiakasId()).append(" ").append(haettu.getEtunimi()).append(" ").append(haettu.getSukunimi()).append(" saamat palvelut: \n");
                             for (Kysely tapahtuma : kyselytulos) {
                                 msg.append(tapahtuma.toString());
                                 msg.append("\n" + "" + "\n");
@@ -204,20 +219,20 @@ public class Haku {
                 tfHetu1.setText("");
                 tfHetu2.setText("");
                 tfTyontekijaNro.setText("");
-                Tietovarasto rekisteri = new Tietovarasto();
+                Tietovarasto rekisteri = new Tietovarasto(kayttaja.getKayttajatunnus(), kayttaja.getSalasana());
                 try {
-                    String palvelunlaji = cbPalvelunlaji.getValue().toString();
-                    LocalDate alkupvm = paivyriAlkaen.getValue();
-                    LocalDate loppupvm = paivyriPaattyen.getValue();
-                    if (palvelunlaji.isEmpty()) {
+                    if (cbPalvelunlaji.getValue() == null || paivyriAlkaen.getValue() == null || paivyriPaattyen.getValue() == null) {
                         Alert virheviesti = new Alert(Alert.AlertType.WARNING);
                         virheviesti.setContentText("Tiedoissa puutteita");
                         virheviesti.show();
 
                     } else {
+                        String palvelunlaji = cbPalvelunlaji.getValue().toString();
+                        LocalDate alkupvm = paivyriAlkaen.getValue();
+                        LocalDate loppupvm = paivyriPaattyen.getValue();
                         StringBuilder msg = new StringBuilder();
                         List<PalvelumaaraKysely> palvelumaarat = rekisteri.haePalveluMaaratYksikoittain(palvelunlaji, alkupvm, loppupvm);
-                        msg.append("Palvelutapahtumat yksiköittäin aikavälillä " + alkupvm.format(formatter) + "-" + loppupvm.format(formatter) + ":\n\n");
+                        msg.append("Palvelutapahtumat yksiköittäin aikavälillä ").append(alkupvm.format(formatter)).append("-").append(loppupvm.format(formatter)).append(":\n\n");
                         for (PalvelumaaraKysely tapahtuma : palvelumaarat) {
                             msg.append(tapahtuma.toString());
                             PalveluKestoKysely kesto = rekisteri.tapahtumienKestoYhteensaAjalla(tapahtuma.getYksikko(), palvelunlaji, alkupvm, loppupvm);
@@ -239,5 +254,50 @@ public class Haku {
             }
         }
         );
+        btKaavio.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                CategoryAxis xAkseli = new CategoryAxis();
+                NumberAxis yAkseli = new NumberAxis(0, 10, 1);
+                yAkseli.setMinorTickVisible(false);
+                yAkseli.setLabel("kpl");
+                xAkseli.setTickLabelRotation(0);
+                BarChart<String, Number> pylvaskaavio = new BarChart<>(xAkseli, yAkseli);
+
+                pylvaskaavio.setLegendVisible(false);
+
+                XYChart.Series palvelukestot = new XYChart.Series();
+
+                Tietovarasto rekisteri = new Tietovarasto(kayttaja.getKayttajatunnus(), kayttaja.getSalasana());
+                try {
+                    if (cbPalvelunlaji.getValue() == null || paivyriAlkaen.getValue() == null || paivyriPaattyen.getValue() == null) {
+                        Alert virheviesti = new Alert(Alert.AlertType.WARNING);
+                        virheviesti.setContentText("Tiedoissa puutteita");
+                        virheviesti.show();
+                    } else {
+                        String palvelunlaji = cbPalvelunlaji.getValue().toString();
+                        LocalDate alkupvm = paivyriAlkaen.getValue();
+                        LocalDate loppupvm = paivyriPaattyen.getValue();
+                        pylvaskaavio.setTitle("Palvelumäärät yksiköittäin: " + palvelunlaji);
+                        List<PalvelumaaraKysely> palvelumaarat = rekisteri.haePalveluMaaratYksikoittain(palvelunlaji, alkupvm, loppupvm);
+                        for (PalvelumaaraKysely tapahtuma : palvelumaarat) {
+                            palvelukestot.getData().add(new XYChart.Data(tapahtuma.getYksikko(), tapahtuma.getTapahtumienMaara()));
+                        }
+                        pylvaskaavio.getData().add(palvelukestot);
+                        pylvaskaavio.setCategoryGap(60);
+                        Scene kaavioNakyma = new Scene(pylvaskaavio, 800, 400);
+                        Stage kaavioIkkuna = new Stage();
+                        kaavioIkkuna.setTitle("Kuvaaja");
+                        kaavioIkkuna.setScene(kaavioNakyma);
+                        kaavioIkkuna.show();
+                    }
+                } catch (Exception e) {
+                    Alert error = new Alert(Alert.AlertType.ERROR);
+                    error.setContentText("Virhe" + e);
+                    error.show();
+                }
+
+            }
+        });
     }
 }

@@ -1,10 +1,12 @@
 package Kayttoliittyma;
 
 import Tietokanta.Tietovarasto;
+import data.Kayttaja;
 import data.Palvelutapahtuma;
 import data.Tyoskentely;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import javafx.beans.binding.Bindings;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -15,7 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
 public class PalvelutapahtumanLisays {
-    
+
     private BorderPane nakyma;
     Label lbHetu = new Label("Asiakkaan henkilötunnus: ");
     TextField tfHetu = new TextField();
@@ -32,15 +34,18 @@ public class PalvelutapahtumanLisays {
     Button talleta = new Button("Talleta");
     Label tyontekijaId = new Label("Työntekijänrosi: ");
     TextField tfTyontekijaId = new TextField();
-    
+
     GridPane palvelutapahtumakentat = new GridPane();
 
+    private Kayttaja kayttaja;
+
     //Konstruktori
-    public PalvelutapahtumanLisays(BorderPane nakyma) {
+    public PalvelutapahtumanLisays(BorderPane nakyma, Kayttaja kayttaja) {
         this.nakyma = nakyma;
+        this.kayttaja = kayttaja;
         asetteleKomponentit();
     }
-    
+
     private void asetteleKomponentit() {
         cbPalvelunlaji.getItems().addAll(
                 "kotikäynti", "puhelu", "dokumentointi", "saatto", "toimistokäynti",
@@ -61,12 +66,15 @@ public class PalvelutapahtumanLisays {
         palvelutapahtumakentat.add(tyontekijaId, 0, 6);
         palvelutapahtumakentat.add(tfTyontekijaId, 1, 6);
         palvelutapahtumakentat.add(talleta, 1, 7);
-        
+
+        palvelutapahtumakentat.getStyleClass().add("lomake");
+        palvelutapahtumakentat.styleProperty().bind(Bindings.concat("-fx-font-size: 15px;"));
+
         this.nakyma.setCenter(palvelutapahtumakentat);
-        
+
         //Tallennuspainikkeen toiminto:
         talleta.setOnAction((event) -> {
-            Tietovarasto rekisteri = new Tietovarasto();
+            Tietovarasto rekisteri = new Tietovarasto(this.kayttaja.getKayttajatunnus(), this.kayttaja.getSalasana());
             try {
                 String asiakasId = tfHetu.getText();
                 String palvelunLaji = cbPalvelunlaji.getValue().toString();
@@ -100,5 +108,5 @@ public class PalvelutapahtumanLisays {
 
         });
     }
-    
+
 }
